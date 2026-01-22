@@ -75,9 +75,9 @@ export function StyleCard({ id, name, thumbnailUrl, priceCredits, description }:
                 shadow-lg
               "
                         >
-                            <span className="text-white font-bold text-xs sm:text-sm flex items-center gap-1">
+                            <span className="text-white font-bold text-[10px] sm:text-xs flex items-center gap-1">
                                 <FontAwesomeIcon icon={faStar} className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-yellow-400" />
-                                {priceCredits}
+                                Giá: {priceCredits} Xu
                             </span>
                         </div>
                     </div>
