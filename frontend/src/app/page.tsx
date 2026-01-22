@@ -325,21 +325,28 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Category Pills - Horizontal Scroll */}
-          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 whitespace-nowrap flex-shrink-0 transition-all ${activeCategory === cat.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                    : 'bg-white/[0.08] text-white/60'
-                  }`}
-              >
-                <FontAwesomeIcon icon={cat.icon} className="w-3 h-3" />
-                {cat.label}
-              </button>
-            ))}
+          {/* Category Pills - Horizontal Scroll with Fade */}
+          <div className="relative">
+            {/* Left Fade */}
+            <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#0a0a0f] to-transparent z-10 pointer-events-none" />
+            {/* Right Fade */}
+            <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-[#0a0a0f] to-transparent z-10 pointer-events-none" />
+
+            <div className="flex gap-1.5 overflow-x-auto pb-1 px-2 scrollbar-hide scroll-smooth">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 whitespace-nowrap flex-shrink-0 transition-all ${activeCategory === cat.id
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md'
+                      : 'bg-white/[0.08] text-white/60 active:bg-white/[0.15]'
+                    }`}
+                >
+                  <FontAwesomeIcon icon={cat.icon} className="w-3 h-3" />
+                  {cat.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -367,8 +374,8 @@ export default function HomePage() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={`px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all duration-200 ${activeCategory === cat.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
-                    : 'bg-white/[0.05] text-white/70 hover:bg-white/[0.1] border border-white/[0.08]'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                  : 'bg-white/[0.05] text-white/70 hover:bg-white/[0.1] border border-white/[0.08]'
                   }`}
               >
                 <FontAwesomeIcon icon={cat.icon} className="w-3.5 h-3.5" />
