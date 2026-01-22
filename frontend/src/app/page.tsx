@@ -32,6 +32,7 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [visibleCount, setVisibleCount] = useState(8) // Số styles hiển thị ban đầu
 
   const allStyles = Object.values(MOCK_STYLES)
 
@@ -338,8 +339,8 @@ export default function HomePage() {
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 whitespace-nowrap flex-shrink-0 transition-all ${activeCategory === cat.id
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md'
-                      : 'bg-white/[0.08] text-white/60 active:bg-white/[0.15]'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md'
+                    : 'bg-white/[0.08] text-white/60 active:bg-white/[0.15]'
                     }`}
                 >
                   <FontAwesomeIcon icon={cat.icon} className="w-3 h-3" />
@@ -402,11 +403,31 @@ export default function HomePage() {
         </div>
 
         {filteredStyles.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-            {filteredStyles.map((style) => (
-              <StyleCard key={style.id} {...style} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+              {filteredStyles.slice(0, visibleCount).map((style) => (
+                <StyleCard key={style.id} {...style} />
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {visibleCount < filteredStyles.length && (
+              <div className="text-center mt-6 sm:mt-8">
+                <button
+                  onClick={() => setVisibleCount(prev => prev + 8)}
+                  className="px-6 sm:px-8 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/80 font-medium hover:bg-white/[0.1] transition-all inline-flex items-center gap-2"
+                >
+                  Xem thêm
+                  <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-xs">
+                    +{Math.min(8, filteredStyles.length - visibleCount)}
+                  </span>
+                </button>
+                <p className="text-white/40 text-xs mt-2">
+                  Đang hiển thị {visibleCount} / {filteredStyles.length} styles
+                </p>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12 sm:py-16">
             <FontAwesomeIcon icon={faSearch} className="w-10 h-10 sm:w-12 sm:h-12 text-white/20 mb-4" />
