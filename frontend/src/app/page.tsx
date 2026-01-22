@@ -303,31 +303,72 @@ export default function HomePage() {
 
       {/* === SEARCH & FILTER SECTION === */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" id="styles">
-        <div className="space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between mb-6">
-          <div className="relative w-full sm:w-72 lg:w-80">
+        {/* Mobile: Compact Filter Bar */}
+        <div className="sm:hidden mb-4">
+          {/* Search + Filter Toggle Row */}
+          <div className="flex gap-2 mb-3">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="Tìm style..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 pl-9 pr-9 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/90 text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+              />
+              <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40">
+                  <FontAwesomeIcon icon={faTimes} className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Pills - Horizontal Scroll */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4 scrollbar-hide">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 whitespace-nowrap flex-shrink-0 transition-all ${activeCategory === cat.id
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                    : 'bg-white/[0.08] text-white/60'
+                  }`}
+              >
+                <FontAwesomeIcon icon={cat.icon} className="w-3 h-3" />
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop: Original Layout */}
+        <div className="hidden sm:flex sm:items-center sm:justify-between mb-6">
+          <div className="relative w-72 lg:w-80">
             <input
               type="text"
               placeholder="Tìm kiếm style..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 sm:h-12 pl-10 sm:pl-12 pr-10 sm:pr-12 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/90 text-sm sm:text-base placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition-all duration-200"
+              className="w-full h-12 pl-12 pr-12 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/90 placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition-all duration-200"
             />
-            <FontAwesomeIcon icon={faSearch} className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <FontAwesomeIcon icon={faSearch} className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
             {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-3.5 sm:right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80">
+              <button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80">
                 <FontAwesomeIcon icon={faTimes} className="w-4 h-4" />
               </button>
             )}
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+          <div className="flex gap-2">
             {CATEGORIES.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap flex-shrink-0 transition-all duration-200 ${activeCategory === cat.id
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
-                  : 'bg-white/[0.05] text-white/70 hover:bg-white/[0.1] border border-white/[0.08]'
+                className={`px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all duration-200 ${activeCategory === cat.id
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                    : 'bg-white/[0.05] text-white/70 hover:bg-white/[0.1] border border-white/[0.08]'
                   }`}
               >
                 <FontAwesomeIcon icon={cat.icon} className="w-3.5 h-3.5" />
@@ -337,15 +378,20 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 mb-4 sm:mb-6">
-          <FontAwesomeIcon
-            icon={CATEGORIES.find(c => c.id === activeCategory)?.icon || faPalette}
-            className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400"
-          />
-          <h2 className="text-lg sm:text-xl font-bold text-white/95">
-            {activeCategory === 'all' ? 'Tất cả' : CATEGORIES.find(c => c.id === activeCategory)?.label}
-          </h2>
-          <span className="px-2 py-0.5 rounded-full bg-white/[0.1] text-white/60 text-xs">{filteredStyles.length}</span>
+        {/* Section Header with Count */}
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-2">
+            <FontAwesomeIcon
+              icon={CATEGORIES.find(c => c.id === activeCategory)?.icon || faPalette}
+              className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400"
+            />
+            <h2 className="text-base sm:text-xl font-bold text-white/95">
+              {activeCategory === 'all' ? 'Tất cả Styles' : CATEGORIES.find(c => c.id === activeCategory)?.label}
+            </h2>
+          </div>
+          <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-medium">
+            {filteredStyles.length} style{filteredStyles.length !== 1 ? 's' : ''}
+          </span>
         </div>
 
         {filteredStyles.length > 0 ? (
