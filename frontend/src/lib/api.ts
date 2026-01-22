@@ -1,6 +1,7 @@
 // API configuration and helper functions
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+const TOKEN_KEY = 'zdream_token'
 
 export interface Style {
     id: string
@@ -8,14 +9,17 @@ export interface Style {
     description: string
     thumbnailUrl: string
     priceCredits: number
+    category?: string
 }
 
 export interface Generation {
     id: string
     styleId: string
+    styleName?: string
     originalImageUrl: string
     resultImageUrl: string | null
     status: 'pending' | 'processing' | 'completed' | 'failed'
+    creditsUsed: number
     createdAt: string
 }
 
@@ -24,6 +28,25 @@ export interface User {
     name: string
     email: string
     credits: number
+    avatar?: string | null
+}
+
+export interface Transaction {
+    id: string
+    type: 'topup' | 'usage' | 'refund' | 'bonus'
+    amount: number
+    credits: number
+    description: string
+    createdAt: string
+}
+
+export interface AuthResponse {
+    success: boolean
+    data: {
+        user: User
+        token: string
+    }
+    message?: string
 }
 
 // API Client
@@ -33,10 +56,29 @@ class ApiClient {
 
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl
+        // Load token from localStorage on init
+        if (typeof window !== 'undefined') {
+            this.token = localStorage.getItem(TOKEN_KEY)
+        }
     }
 
-    setToken(token: string) {
+    setToken(token: string | null) {
         this.token = token
+        if (typeof window !== 'undefined') {
+            if (token) {
+                localStorage.setItem(TOKEN_KEY, token)
+            } else {
+                localStorage.removeItem(TOKEN_KEY)
+            }
+        }
+    }
+
+    getToken(): string | null {
+        return this.token
+    }
+
+    isAuthenticated(): boolean {
+        return !!this.token
     }
 
     private async request<T>(
@@ -64,6 +106,15 @@ class ApiClient {
             headers,
         })
 
+        // Handle 401 Unauthorized
+        if (response.status === 401) {
+            this.setToken(null)
+            if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+                window.location.href = '/login'
+            }
+            throw new Error('Phiên đăng nhập hết hạn')
+        }
+
         if (!response.ok) {
             const error = await response.json().catch(() => ({ message: 'Request failed' }))
             throw new Error(error.message || 'Request failed')
@@ -72,17 +123,49 @@ class ApiClient {
         return response.json()
     }
 
-    // Styles
-    async getStyles(): Promise<{ data: Style[] }> {
+    // ========== AUTH ==========
+    async login(email: string, password: string): Promise<AuthResponse> {
+        const response = await this.request<AuthResponse>('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password }),
+        })
+        if (response.success && response.data.token) {
+            this.setToken(response.data.token)
+        }
+        return response
+    }
+
+    async register(name: string, email: string, password: string): Promise<AuthResponse> {
+        const response = await this.request<AuthResponse>('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({ name, email, password, password_confirmation: password }),
+        })
+        if (response.success && response.data.token) {
+            this.setToken(response.data.token)
+        }
+        return response
+    }
+
+    async logout(): Promise<void> {
+        try {
+            await this.request('/auth/logout', { method: 'POST' })
+        } catch {
+            // Ignore errors on logout
+        }
+        this.setToken(null)
+    }
+
+    // ========== STYLES ==========
+    async getStyles(): Promise<{ success: boolean; data: Style[] }> {
         return this.request('/styles')
     }
 
-    async getStyle(id: string): Promise<{ data: Style }> {
+    async getStyle(id: string): Promise<{ success: boolean; data: Style }> {
         return this.request(`/styles/${id}`)
     }
 
-    // Generation
-    async generateImage(styleId: string, image: File): Promise<{ data: Generation }> {
+    // ========== GENERATION ==========
+    async generateImage(styleId: string, image: File): Promise<{ success: boolean; data: Generation; message?: string }> {
         const formData = new FormData()
         formData.append('style_id', styleId)
         formData.append('image', image)
@@ -93,17 +176,25 @@ class ApiClient {
         })
     }
 
-    async getGeneration(id: string): Promise<{ data: Generation }> {
+    async getGeneration(id: string): Promise<{ success: boolean; data: Generation }> {
         return this.request(`/generations/${id}`)
     }
 
-    // User
-    async getUser(): Promise<{ data: User }> {
+    async getGenerations(page = 1): Promise<{ success: boolean; data: { data: Generation[]; current_page: number; last_page: number } }> {
+        return this.request(`/generations?page=${page}`)
+    }
+
+    // ========== USER ==========
+    async getUser(): Promise<{ success: boolean; data: User }> {
         return this.request('/user')
     }
 
-    async getUserCredits(): Promise<{ data: { credits: number } }> {
+    async getUserCredits(): Promise<{ success: boolean; data: { credits: number } }> {
         return this.request('/user/credits')
+    }
+
+    async getTransactions(page = 1): Promise<{ success: boolean; data: { data: Transaction[]; current_page: number; last_page: number } }> {
+        return this.request(`/user/transactions?page=${page}`)
     }
 }
 
@@ -132,3 +223,4 @@ export async function pollGenerationStatus(
 
     throw new Error('Generation timed out')
 }
+

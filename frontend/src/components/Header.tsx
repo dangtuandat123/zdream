@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faWandMagicSparkles,
@@ -20,6 +21,8 @@ import {
     faCog
 } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/contexts/auth-context'
+import { useCredits } from '@/hooks/use-credits'
 
 // Navigation items
 const NAV_ITEMS = [
@@ -29,18 +32,14 @@ const NAV_ITEMS = [
 ]
 
 export function Header() {
+    const router = useRouter()
+    const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth()
+    const { credits } = useCredits()
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
 
-    // TODO: Fetch from API
-    const credits = 0
-    const isLoggedIn = true // Mock: đang đăng nhập
-    const user = {
-        name: 'Tuấn Đạt',
-        avatar: null, // null = hiển thị chữ cái đầu
-        email: 'dat@example.com'
-    }
+    const isLoggedIn = isAuthenticated && !authLoading
 
     // Scroll detection
     useEffect(() => {
@@ -247,7 +246,11 @@ export function Header() {
                                             <div className="border-t border-white/[0.05] pt-1">
                                                 <button
                                                     className="w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-red-500/10 transition-colors text-sm"
-                                                    onClick={() => setIsUserMenuOpen(false)}
+                                                    onClick={async () => {
+                                                        setIsUserMenuOpen(false)
+                                                        await logout()
+                                                        router.push('/')
+                                                    }}
                                                 >
                                                     <FontAwesomeIcon icon={faSignOutAlt} className="w-4 h-4" />
                                                     Đăng xuất

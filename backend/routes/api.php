@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GenerationController;
 use App\Http\Controllers\Api\StyleController;
 use App\Http\Controllers\Api\UserController;
@@ -17,12 +18,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Auth routes - Public
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/login', [AuthController::class, 'login']);
+
 // Public routes - Không cần auth
 Route::get('/styles', [StyleController::class, 'index']);
 Route::get('/styles/{style}', [StyleController::class, 'show']);
 
 // Protected routes - Cần auth
 Route::middleware('auth:sanctum')->group(function () {
+    // Auth
+    Route::post('/auth/logout', [AuthController::class, 'logout']);
+
     // User
     Route::get('/user', [UserController::class, 'me']);
     Route::get('/user/credits', [UserController::class, 'credits']);
@@ -33,3 +41,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/generations', [GenerationController::class, 'history']);
     Route::get('/generations/{generation}', [GenerationController::class, 'show']);
 });
+

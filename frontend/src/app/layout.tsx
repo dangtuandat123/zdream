@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "@/lib/fontawesome"; // Import FontAwesome config
 import { Header } from "@/components/Header";
+import { AuthProvider } from "@/contexts/auth-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,11 +38,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans`}
       >
-        <Header />
-        <main className="pt-16">
-          {children}
-        </main>
+        <AuthProvider>
+          <Header />
+          <main className="pt-16">
+            {children}
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );
 }
+

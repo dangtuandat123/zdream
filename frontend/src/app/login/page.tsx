@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faWandMagicSparkles,
@@ -12,21 +13,37 @@ import {
     faArrowRight
 } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons'
+import { useAuth } from '@/contexts/auth-context'
 
 export default function LoginPage() {
+    const router = useRouter()
+    const { login, isAuthenticated, isLoading: authLoading } = useAuth()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (!authLoading && isAuthenticated) {
+            router.push('/')
+        }
+    }, [authLoading, isAuthenticated, router])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
-        // TODO: Call API
-        setTimeout(() => {
+        setError(null)
+
+        const result = await login(email, password)
+
+        if (result.success) {
+            router.push('/')
+        } else {
+            setError(result.message || 'Đăng nhập thất bại')
             setIsLoading(false)
-            window.location.href = '/'
-        }, 1500)
+        }
     }
 
     return (
@@ -90,6 +107,13 @@ export default function LoginPage() {
                                 </button>
                             </div>
                         </div>
+
+                        {/* Error Message */}
+                        {error && (
+                            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                                {error}
+                            </div>
+                        )}
 
                         {/* Forgot Password */}
                         <div className="text-right">
