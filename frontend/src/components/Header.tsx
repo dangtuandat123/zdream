@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button'
 // Navigation items
 const NAV_ITEMS = [
     { href: '/', label: 'Trang chủ', icon: faHome },
-    { href: '/#styles', label: 'Styles', icon: faPalette },
+    { href: '/styles', label: 'Styles', icon: faPalette },
     { href: '/history', label: 'Lịch sử', icon: faHistory },
 ]
 

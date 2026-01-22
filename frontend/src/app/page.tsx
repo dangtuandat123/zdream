@@ -302,142 +302,46 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* === SEARCH & FILTER SECTION === */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" id="styles">
-        {/* Mobile: Compact Filter Bar */}
-        <div className="sm:hidden mb-4">
-          {/* Search + Filter Toggle Row */}
-          <div className="flex gap-2 mb-3">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Tìm style..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-9 pr-9 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/90 text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
-              />
-              <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40">
-                  <FontAwesomeIcon icon={faTimes} className="w-3.5 h-3.5" />
-                </button>
-              )}
+      {/* === STYLES PREVIEW SECTION === */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12" id="styles">
+        {/* Section Header */}
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
+              <FontAwesomeIcon icon={faPalette} className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-white">Styles Phổ Biến</h2>
+              <p className="text-white/50 text-sm">Chọn style yêu thích của bạn</p>
             </div>
           </div>
-
-          {/* Category Pills - Horizontal Scroll with Fade */}
-          <div className="relative">
-            {/* Left Fade */}
-            <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#0a0a0f] to-transparent z-10 pointer-events-none" />
-            {/* Right Fade */}
-            <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-[#0a0a0f] to-transparent z-10 pointer-events-none" />
-
-            <div className="flex gap-1.5 overflow-x-auto pb-1 px-2 scrollbar-hide scroll-smooth">
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 whitespace-nowrap flex-shrink-0 transition-all ${activeCategory === cat.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md'
-                    : 'bg-white/[0.08] text-white/60 active:bg-white/[0.15]'
-                    }`}
-                >
-                  <FontAwesomeIcon icon={cat.icon} className="w-3 h-3" />
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Link
+            href="/styles"
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.1] transition-all text-sm font-medium"
+          >
+            Xem tất cả
+            <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" />
+          </Link>
         </div>
 
-        {/* Desktop: Original Layout */}
-        <div className="hidden sm:flex sm:items-center sm:justify-between mb-6">
-          <div className="relative w-72 lg:w-80">
-            <input
-              type="text"
-              placeholder="Tìm kiếm style..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-12 pr-12 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/90 placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition-all duration-200"
-            />
-            <FontAwesomeIcon icon={faSearch} className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80">
-                <FontAwesomeIcon icon={faTimes} className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          <div className="flex gap-2">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2 transition-all duration-200 ${activeCategory === cat.id
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
-                  : 'bg-white/[0.05] text-white/70 hover:bg-white/[0.1] border border-white/[0.08]'
-                  }`}
-              >
-                <FontAwesomeIcon icon={cat.icon} className="w-3.5 h-3.5" />
-                {cat.label}
-              </button>
-            ))}
-          </div>
+        {/* Styles Grid - Show only 8 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+          {allStyles.slice(0, 8).map((style) => (
+            <StyleCard key={style.id} {...style} />
+          ))}
         </div>
 
-        {/* Section Header with Count */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <div className="flex items-center gap-2">
-            <FontAwesomeIcon
-              icon={CATEGORIES.find(c => c.id === activeCategory)?.icon || faPalette}
-              className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400"
-            />
-            <h2 className="text-base sm:text-xl font-bold text-white/95">
-              {activeCategory === 'all' ? 'Tất cả Styles' : CATEGORIES.find(c => c.id === activeCategory)?.label}
-            </h2>
-          </div>
-          <span className="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-medium">
-            {filteredStyles.length} style{filteredStyles.length !== 1 ? 's' : ''}
-          </span>
+        {/* View All Button - Mobile */}
+        <div className="mt-6 sm:mt-8 text-center">
+          <Link
+            href="/styles"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all"
+          >
+            <FontAwesomeIcon icon={faPalette} className="w-4 h-4" />
+            Xem tất cả {allStyles.length} Styles
+            <FontAwesomeIcon icon={faArrowRight} className="w-4 h-4" />
+          </Link>
         </div>
-
-        {filteredStyles.length > 0 ? (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-              {filteredStyles.slice(0, visibleCount).map((style) => (
-                <StyleCard key={style.id} {...style} />
-              ))}
-            </div>
-
-            {/* Load More Button */}
-            {visibleCount < filteredStyles.length && (
-              <div className="text-center mt-6 sm:mt-8">
-                <button
-                  onClick={() => setVisibleCount(prev => prev + 8)}
-                  className="px-6 sm:px-8 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/80 font-medium hover:bg-white/[0.1] transition-all inline-flex items-center gap-2"
-                >
-                  Xem thêm
-                  <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-xs">
-                    +{Math.min(8, filteredStyles.length - visibleCount)}
-                  </span>
-                </button>
-                <p className="text-white/40 text-xs mt-2">
-                  Đang hiển thị {visibleCount} / {filteredStyles.length} styles
-                </p>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-12 sm:py-16">
-            <FontAwesomeIcon icon={faSearch} className="w-10 h-10 sm:w-12 sm:h-12 text-white/20 mb-4" />
-            <h3 className="text-lg sm:text-xl font-semibold text-white/80 mb-2">Không tìm thấy</h3>
-            <p className="text-white/50 text-sm">Thử từ khóa khác</p>
-            <button onClick={() => { setSearchQuery(''); setActiveCategory('all'); }} className="mt-4 px-5 py-2 rounded-full bg-white/[0.05] text-white/70 hover:bg-white/[0.1] text-sm">
-              Xem tất cả
-            </button>
-          </div>
-        )}
       </section>
 
       {/* === HOW IT WORKS === */}
