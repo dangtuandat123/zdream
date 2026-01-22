@@ -293,8 +293,8 @@ export default function HomePage() {
               key={index}
               onClick={() => goToSlide(index)}
               className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide
-                  ? 'w-6 bg-gradient-to-r from-purple-500 to-pink-500'
-                  : 'w-2 bg-white/20 hover:bg-white/40'
+                ? 'w-6 bg-gradient-to-r from-purple-500 to-pink-500'
+                : 'w-2 bg-white/20 hover:bg-white/40'
                 }`}
             />
           ))}
@@ -326,8 +326,8 @@ export default function HomePage() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={`px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap flex-shrink-0 transition-all duration-200 ${activeCategory === cat.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
-                    : 'bg-white/[0.05] text-white/70 hover:bg-white/[0.1] border border-white/[0.08]'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                  : 'bg-white/[0.05] text-white/70 hover:bg-white/[0.1] border border-white/[0.08]'
                   }`}
               >
                 <FontAwesomeIcon icon={cat.icon} className="w-3.5 h-3.5" />
@@ -338,7 +338,10 @@ export default function HomePage() {
         </div>
 
         <div className="flex items-center gap-2 mb-4 sm:mb-6">
-          <FontAwesomeIcon icon={faPalette} className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+          <FontAwesomeIcon
+            icon={CATEGORIES.find(c => c.id === activeCategory)?.icon || faPalette}
+            className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400"
+          />
           <h2 className="text-lg sm:text-xl font-bold text-white/95">
             {activeCategory === 'all' ? 'Tất cả' : CATEGORIES.find(c => c.id === activeCategory)?.label}
           </h2>
